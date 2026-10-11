@@ -1,0 +1,602 @@
+#:import T theme.get_theme
+#:import dp kivy.metrics.dp
+
+<ActionBar>:
+    background_color: T()['primary']
+    color: T()['text_inverse']
+
+<Card@BoxLayout>:
+    orientation: 'vertical'
+    padding: dp(12)
+    spacing: dp(6)
+    size_hint_y: None
+    canvas.before:
+        Color:
+            rgba: T()['card']
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(10)]
+
+<RoundButton@Button>:
+    background_normal: ''
+    background_color: T()['primary']
+    color: T()['text_inverse']
+    bold: True
+    size_hint_y: None
+    height: dp(48)
+
+<NavButton@Button>:
+    background_normal: ''
+    background_color: T()['dark']
+    color: T()['text_inverse']
+    font_size: '11sp'
+    size_hint_y: None
+    height: dp(48)
+
+<FieldRow@Card>:
+    size_hint_y: None
+    height: dp(110)
+    Label:
+        text: root.field_name if hasattr(root, 'field_name') else ''
+        color: T()['text']
+        bold: True
+        font_size: '15sp'
+        size_hint_y: None
+        height: dp(24)
+    Label:
+        text: root.field_sub if hasattr(root, 'field_sub') else ''
+        color: T()['text_muted']
+        font_size: '12sp'
+        size_hint_y: None
+        height: dp(18)
+    Label:
+        text: root.field_progress if hasattr(root, 'field_progress') else ''
+        color: T()['secondary']
+        font_size: '12sp'
+        bold: True
+        size_hint_y: None
+        height: dp(18)
+    Button:
+        text: root.field_status if hasattr(root, 'field_status') else ''
+        background_normal: ''
+        background_color: T()['primary'] if (root.field_status if hasattr(root, 'field_status') else '') == '● En cours' else T()['text_muted']
+        color: T()['text_inverse']
+        font_size: '11sp'
+        size_hint_y: None
+        height: dp(28)
+
+<TaskRow@BoxLayout>:
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: dp(52)
+    padding: dp(8)
+    spacing: dp(6)
+    canvas.before:
+        Color:
+            rgba: T()['card']
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(8)]
+    CheckBox:
+        active: root.done if hasattr(root, 'done') else False
+        size_hint: None, None
+        size: dp(40), dp(40)
+        on_active: root.on_toggle(self.active) if hasattr(root, 'on_toggle') else None
+    Label:
+        text: root.task_name if hasattr(root, 'task_name') else ''
+        color: T()['text_muted'] if (root.done if hasattr(root, 'done') else False) else T()['text']
+        font_size: '13sp'
+        text_size: self.width, None
+        valign: 'middle'
+    Button:
+        text: 'Modifier'
+        size_hint: None, None
+        size: dp(80), dp(34)
+        background_normal: ''
+        background_color: T()['secondary']
+        color: T()['text_inverse']
+        font_size: '11sp'
+        on_release: root.on_edit() if hasattr(root, 'on_edit') else None
+    Button:
+        text: 'Suppr.'
+        size_hint: None, None
+        size: dp(70), dp(34)
+        background_normal: ''
+        background_color: T()['danger']
+        color: T()['text_inverse']
+        font_size: '11sp'
+        on_release: root.on_delete() if hasattr(root, 'on_delete') else None
+
+<HomeScreen>:
+    name: 'home'
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: T()['bg']
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        ActionBar:
+            title: '🌱 AgriGestion'
+
+        ScrollView:
+            BoxLayout:
+                orientation: 'vertical'
+                padding: dp(12)
+                spacing: dp(12)
+                size_hint_y: None
+                height: self.minimum_height
+
+                Card:
+                    Label:
+                        text: '📊 Progression globale : {}%'.format(root.progress)
+                        color: T()['text']
+                        bold: True
+                        font_size: '15sp'
+                        size_hint_y: None
+                        height: dp(24)
+                    ProgressBar:
+                        max: 100
+                        value: root.progress
+                        size_hint_y: None
+                        height: dp(20)
+
+                BoxLayout:
+                    size_hint_y: None
+                    height: dp(80)
+                    spacing: dp(8)
+                    Card:
+                        Label:
+                            text: str(root.nb_fields)
+                            color: T()['primary']
+                            bold: True
+                            font_size: '22sp'
+                            halign: 'center'
+                        Label:
+                            text: 'Champs'
+                            color: T()['text_muted']
+                            font_size: '12sp'
+                            halign: 'center'
+                    Card:
+                        Label:
+                            text: str(root.nb_en_cours)
+                            color: T()['secondary']
+                            bold: True
+                            font_size: '22sp'
+                            halign: 'center'
+                        Label:
+                            text: 'En cours'
+                            color: T()['text_muted']
+                            font_size: '12sp'
+                            halign: 'center'
+                    Card:
+                        Label:
+                            text: str(root.nb_termines)
+                            color: T()['text_muted']
+                            bold: True
+                            font_size: '22sp'
+                            halign: 'center'
+                        Label:
+                            text: 'Terminés'
+                            color: T()['text_muted']
+                            font_size: '12sp'
+                            halign: 'center'
+
+                Card:
+                    size_hint_y: None
+                    height: dp(70)
+                    Label:
+                        text: '📋 {} / {} tâches accomplies'.format(root.done_tasks, root.total_tasks)
+                        color: T()['text']
+                        bold: True
+                        font_size: '14sp'
+                        halign: 'center'
+
+        BoxLayout:
+            size_hint_y: None
+            height: dp(56)
+            spacing: dp(4)
+            padding: dp(4)
+            NavButton:
+                text: '🏠\nAccueil'
+                on_release: app.go_to('home')
+            NavButton:
+                text: '🌾\nChamps'
+                on_release: app.go_to('fields')
+            NavButton:
+                text: '📋\nTâches'
+                on_release: app.go_to('tasks')
+            NavButton:
+                text: '👤\nProfil'
+                on_release: app.go_to('profile')
+
+
+<FieldsScreen>:
+    name: 'fields'
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: T()['bg']
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        ActionBar:
+            title: '🌾 Mes Champs'
+
+        TextInput:
+            id: search
+            hint_text: '🔍 Rechercher un champ...'
+            size_hint_y: None
+            height: dp(44)
+            multiline: False
+            background_color: T()['card']
+            foreground_color: T()['text']
+            hint_text_color: T()['text_muted']
+            padding: [dp(10), dp(12)]
+            on_text: root.on_search(self.text)
+
+        ScrollView:
+            BoxLayout:
+                id: fields_list
+                orientation: 'vertical'
+                padding: dp(12)
+                spacing: dp(10)
+                size_hint_y: None
+                height: self.minimum_height
+
+        RoundButton:
+            text: '➕ Ajouter un nouveau champ'
+            on_release: app.go_to('add_field')
+
+        BoxLayout:
+            size_hint_y: None
+            height: dp(56)
+            spacing: dp(4)
+            padding: dp(4)
+            NavButton:
+                text: '🏠\nAccueil'
+                on_release: app.go_to('home')
+            NavButton:
+                text: '🌾\nChamps'
+                on_release: app.go_to('fields')
+            NavButton:
+                text: '📋\nTâches'
+                on_release: app.go_to('tasks')
+            NavButton:
+                text: '👤\nProfil'
+                on_release: app.go_to('profile')
+
+
+<FieldDetailScreen>:
+    name: 'field_detail'
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: T()['bg']
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        ActionBar:
+            title: '🌾 ' + (root.field_name or '')
+
+        Card:
+            size_hint_y: None
+            height: dp(120)
+            Label:
+                text: '📍 Superficie : ' + (root.field_area or '-')
+                color: T()['text']
+                font_size: '13sp'
+            Label:
+                text: '🌱 Culture : ' + (root.field_crop or '-')
+                color: T()['text']
+                font_size: '13sp'
+            Label:
+                text: '🏞️ Terrain : ' + (root.field_terrain or '-')
+                color: T()['text']
+                font_size: '13sp'
+            Label:
+                text: 'Statut : ' + (root.field_status or '')
+                color: T()['primary'] if root.field_status == '● En cours' else T()['text_muted']
+                bold: True
+                font_size: '13sp'
+
+        Label:
+            text: '📋 Tâches à accomplir'
+            color: T()['text']
+            bold: True
+            font_size: '15sp'
+            size_hint_y: None
+            height: dp(30)
+
+        ScrollView:
+            BoxLayout:
+                id: tasks_list
+                orientation: 'vertical'
+                padding: dp(10)
+                spacing: dp(6)
+                size_hint_y: None
+                height: self.minimum_height
+
+        BoxLayout:
+            size_hint_y: None
+            height: dp(52)
+            padding: dp(8)
+            spacing: dp(6)
+            TextInput:
+                id: new_task
+                hint_text: 'Nouvelle tâche...'
+                multiline: False
+                background_color: T()['card']
+                foreground_color: T()['text']
+                hint_text_color: T()['text_muted']
+                padding: [dp(10), dp(12)]
+            Button:
+                text: '➕'
+                size_hint_x: None
+                width: dp(60)
+                background_normal: ''
+                background_color: T()['primary']
+                color: T()['text_inverse']
+                font_size: '20sp'
+                on_release: root.add_task()
+
+        BoxLayout:
+            size_hint_y: None
+            height: dp(48)
+            spacing: dp(6)
+            padding: dp(6)
+            Button:
+                text: '← Retour'
+                background_normal: ''
+                background_color: T()['dark']
+                color: T()['text_inverse']
+                on_release: app.go_to('fields')
+            Button:
+                text: '🗑️ Supprimer le champ'
+                background_normal: ''
+                background_color: T()['danger']
+                color: T()['text_inverse']
+                on_release: root.delete_field()
+
+
+<AddFieldScreen>:
+    name: 'add_field'
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: T()['bg']
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        ActionBar:
+            title: '📝 Nouveau champ' if root.edit_index is None else '✏️ Modifier le champ'
+
+        ScrollView:
+            BoxLayout:
+                orientation: 'vertical'
+                padding: dp(12)
+                spacing: dp(10)
+                size_hint_y: None
+                height: self.minimum_height
+
+                Card:
+                    size_hint_y: None
+                    height: dp(280)
+                    Label:
+                        text: 'Nom du champ :'
+                        color: T()['text']
+                        size_hint_y: None
+                        height: dp(22)
+                    TextInput:
+                        id: name
+                        text: root.edit_name or ''
+                        multiline: False
+                        size_hint_y: None
+                        height: dp(42)
+                        background_color: T()['card']
+                        foreground_color: T()['text']
+                        padding: [dp(10), dp(12)]
+                    Label:
+                        text: 'Superficie (Ha) :'
+                        color: T()['text']
+                        size_hint_y: None
+                        height: dp(22)
+                    TextInput:
+                        id: area
+                        text: root.edit_area or ''
+                        multiline: False
+                        input_filter: 'float'
+                        size_hint_y: None
+                        height: dp(42)
+                        background_color: T()['card']
+                        foreground_color: T()['text']
+                        padding: [dp(10), dp(12)]
+                    Label:
+                        text: 'Type de terrain :'
+                        color: T()['text']
+                        size_hint_y: None
+                        height: dp(22)
+                    TextInput:
+                        id: terrain
+                        text: root.edit_terrain or ''
+                        multiline: False
+                        size_hint_y: None
+                        height: dp(42)
+                        background_color: T()['card']
+                        foreground_color: T()['text']
+                        padding: [dp(10), dp(12)]
+                    Label:
+                        text: 'Culture principale :'
+                        color: T()['text']
+                        size_hint_y: None
+                        height: dp(22)
+                    TextInput:
+                        id: crop
+                        text: root.edit_crop or ''
+                        multiline: False
+                        size_hint_y: None
+                        height: dp(42)
+                        background_color: T()['card']
+                        foreground_color: T()['text']
+                        padding: [dp(10), dp(12)]
+
+                RoundButton:
+                    text: '✅ Confirmer'
+                    on_release: root.save()
+                RoundButton:
+                    text: '← Annuler'
+                    background_color: T()['dark']
+                    on_release: app.go_to('fields')
+
+
+<TasksScreen>:
+    name: 'tasks'
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: T()['bg']
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        ActionBar:
+            title: '📋 Toutes les tâches'
+
+        BoxLayout:
+            size_hint_y: None
+            height: dp(46)
+            spacing: dp(4)
+            padding: dp(6)
+            Button:
+                text: 'Toutes'
+                background_normal: ''
+                background_color: T()['primary'] if root.filter_mode == 'all' else T()['dark']
+                color: T()['text_inverse']
+                on_release: root.set_filter('all')
+            Button:
+                text: 'À faire'
+                background_normal: ''
+                background_color: T()['primary'] if root.filter_mode == 'todo' else T()['dark']
+                color: T()['text_inverse']
+                on_release: root.set_filter('todo')
+            Button:
+                text: 'Terminées'
+                background_normal: ''
+                background_color: T()['primary'] if root.filter_mode == 'done' else T()['dark']
+                color: T()['text_inverse']
+                on_release: root.set_filter('done')
+
+        ScrollView:
+            BoxLayout:
+                id: tasks_list
+                orientation: 'vertical'
+                padding: dp(10)
+                spacing: dp(6)
+                size_hint_y: None
+                height: self.minimum_height
+
+        BoxLayout:
+            size_hint_y: None
+            height: dp(56)
+            spacing: dp(4)
+            padding: dp(4)
+            NavButton:
+                text: '🏠\nAccueil'
+                on_release: app.go_to('home')
+            NavButton:
+                text: '🌾\nChamps'
+                on_release: app.go_to('fields')
+            NavButton:
+                text: '📋\nTâches'
+                on_release: app.go_to('tasks')
+            NavButton:
+                text: '👤\nProfil'
+                on_release: app.go_to('profile')
+
+
+<ProfileScreen>:
+    name: 'profile'
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: T()['bg']
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        ActionBar:
+            title: '👤 Profil'
+
+        BoxLayout:
+            size_hint_y: None
+            height: dp(52)
+            padding: dp(8)
+            Button:
+                text: '☀️ Thème clair' if root.dark else '🌙 Thème sombre'
+                background_normal: ''
+                background_color: T()['secondary']
+                color: T()['text_inverse']
+                on_release: root.toggle_theme()
+
+        Card:
+            size_hint_y: None
+            height: dp(280)
+            Label:
+                text: '👨‍🌾 Frejus Ekra'
+                color: T()['text']
+                bold: True
+                font_size: '22sp'
+                halign: 'center'
+            Label:
+                text: '👨‍🔧 Technicien Agricole'
+                color: T()['primary']
+                font_size: '14sp'
+                halign: 'center'
+            Label:
+                text: '📧 frejusekra3@gmail.com'
+                color: T()['text_muted']
+                font_size: '12sp'
+                halign: 'center'
+            Label:
+                text: '📱 +225 07 58 25 04 89'
+                color: T()['text_muted']
+                font_size: '12sp'
+                halign: 'center'
+            Label:
+                text: root.stats_text
+                color: T()['text']
+                bold: True
+                font_size: '14sp'
+                halign: 'center'
+
+        Widget:
+
+        BoxLayout:
+            size_hint_y: None
+            height: dp(56)
+            spacing: dp(4)
+            padding: dp(4)
+            NavButton:
+                text: '🏠\nAccueil'
+                on_release: app.go_to('home')
+            NavButton:
+                text: '🌾\nChamps'
+                on_release: app.go_to('fields')
+            NavButton:
+                text: '📋\nTâches'
+                on_release: app.go_to('tasks')
+            NavButton:
+                text: '👤\nProfil'
+                on_release: app.go_to('profile')
